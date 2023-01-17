@@ -33,24 +33,7 @@ const db = {};
 db.User = require('../models/user')(sequelize, Sequelize);
 db.Oauth = require('../models/oauth')(sequelize, Sequelize);
 db.ActivationCode = require('../models/activation_code')(sequelize, Sequelize);
-db.Application = require('../models/application')(sequelize, Sequelize);
-db.Admin = require('../models/admin')(sequelize, Sequelize);
-db.Deal = require('../models/deal')(sequelize, Sequelize);
-db.Support = require('../models/support')(sequelize, Sequelize);
-db.Commitment = require('../models/commitment')(sequelize, Sequelize);
-db.Notification = require('../models/notification')(sequelize, Sequelize);
 db.PasswordReset = require('../models/password_reset')(sequelize, Sequelize);
-db.Payment = require('../models/payment')(sequelize, Sequelize);
-db.Subscriber = require('../models/subscriber')(sequelize, Sequelize);
-
-
-db.User.hasMany(db.Commitment, {foreignKey: 'user_id'});
-db.Commitment.belongsTo(db.User, {foreignKey: 'user_id'});
-
-db.Deal.hasMany(db.Commitment, {foreignKey: 'deal_uuid'});
-db.Commitment.belongsTo(db.Deal, {foreignKey: 'deal_uuid'});
-
-
 
 db.sequelize = sequelize;
  

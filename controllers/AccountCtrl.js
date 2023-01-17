@@ -17,18 +17,7 @@ module.exports = {
       }
     });
 
-  },
-
-  adminLogout: async (req, res, next) => {
-
-    return res.status(200).json({
-      "success": {
-        "status": "SUCCESS",
-        'message': "User logged out successfully"
-      }
-    });
-
-  },
+  }
 
 
 }
