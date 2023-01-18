@@ -13,8 +13,7 @@ var User = (sequelize, type) => {
     last_name: Sequelize.STRING,
     password: Sequelize.STRING,
     email: Sequelize.STRING,
-    activation: Sequelize.INTEGER,
-    phone_number: Sequelize.STRING,
+    status: Sequelize.INTEGER,
   })
 }
  

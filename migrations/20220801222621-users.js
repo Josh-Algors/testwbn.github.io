@@ -16,14 +16,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      user_id: {
-        allowNull: true,
-        type: Sequelize.STRING,
-      },
-      account_type: {
-        allowNull: true,
-        type: Sequelize.STRING,
-      },
       first_name: {
         allowNull: true,
         type: Sequelize.STRING,
@@ -40,23 +32,7 @@ module.exports = {
         allowNull: true,
         type: Sequelize.STRING,
       },
-      description: {
-        allowNull: true,
-        type: Sequelize.STRING,
-      },
-      linkedin: {
-        allowNull: true,
-        type: Sequelize.STRING,
-      },
-      profile_url: {
-        allowNull: true,
-        type: Sequelize.STRING,
-      },
-      phone_number: {
-        allowNull: true,
-        type: Sequelize.STRING,
-      },
-      activation: {
+      status: {
         allowNull: true,
         type: Sequelize.INTEGER,
       },
