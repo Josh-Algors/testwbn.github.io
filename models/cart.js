@@ -17,27 +17,3 @@ var Cart = (sequelize, type) => {
 }
 
 module.exports = Cart;
-
-
-// id: {
-//     allowNull: false,
-//     autoIncrement: true,
-//     primaryKey: true,
-//     type: Sequelize.INTEGER
-//   },
-//   product_id: {
-//     allowNull: true,
-//     type: Sequelize.STRING,
-//   },
-//   price: {
-//     allowNull: true,
-//     type: Sequelize.STRING,
-//   },
-//   quantity: {
-//     allowNull: true,
-//     type: Sequelize.INTEGER,
-//   },
-//   status: {
-//     allowNull: true,
-//     type: Sequelize.INTEGER,
-//   },

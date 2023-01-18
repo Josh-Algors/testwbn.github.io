@@ -1,9 +1,7 @@
 const request = require('request');
 const db  = require('../database/db');
-const axios = require('axios');
 const jwt_decode = require('jwt-decode');
 const jwt = require('jsonwebtoken');
-const moment = require('moment');
 require('dotenv').config();
 
 
