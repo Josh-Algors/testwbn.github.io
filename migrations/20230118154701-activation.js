@@ -9,18 +9,22 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
 
-    await queryInterface.createTable('password_resets', {
+    await queryInterface.createTable('activation_code', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      user_id: {
+      email: {
         allowNull: true,
         type: Sequelize.STRING,
       },
-      token: {
+      otp: {
+        allowNull: true,
+        type: Sequelize.STRING,
+      },
+      expiry_date: {
         allowNull: true,
         type: Sequelize.STRING,
       },
@@ -48,6 +52,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-     await queryInterface.dropTable('password_resets');
+     await queryInterface.dropTable('activation_code');
   }
 };

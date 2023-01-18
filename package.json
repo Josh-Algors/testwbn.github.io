@@ -1,7 +1,7 @@
 {
   "name": "nodejs",
   "version": "1.0.0",
-  "description": "NodeJs Restful API for Fundall Business",
+  "description": "NodeJs Restful API for WBN",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -16,10 +16,9 @@
     "deploy": "npm run git-deploy",
     "update": "sudo git pull && sudo pm2 stop advisory && sudo pm2 start advisory"
   },
-  "author": "Babafemi Ajobiewe",
+  "author": "Olukoya Joshua",
   "license": "ISC",
   "dependencies": {
-    "autosave": "^1.0.3",
     "aws-sdk": "^2.596.0",
     "axios": "^0.21.1",
     "base64topdf": "^1.1.8",
@@ -30,7 +29,6 @@
     "cloudinary": "^1.29.1",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
-    "crypto-js": "^4.0.0",
     "dotenv": "^8.2.0",
     "easysoap": "^2.2.0",
     "express": "^4.17.1",
@@ -38,12 +36,10 @@
     "express-handlebars": "^5.3.2",
     "express-ip": "^1.0.4",
     "express-rate-limit": "^5.2.3",
-    "fast-csv": "^4.3.6",
     "fs": "0.0.1-security",
     "handlebars": "^4.7.6",
     "helmet": "^4.3.1",
     "http-errors": "^1.8.0",
-    "interswitch": "^2.1.7",
     "ioredis": "^4.27.9",
     "joi": "^14.3.1",
     "jsonwebtoken": "^8.5.1",
@@ -64,19 +60,10 @@
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
-    "pdf-creator-node": "^2.3.4",
     "phantomjs-prebuilt": "^2.1.16",
-    "puppeteer": "^13.6.0",
     "redis": "^4.0.3",
     "request": "^2.88.0",
-    "sequelize": "^5.21.3",
-    "sharp": "^0.30.3",
-    "slugify": "^1.6.0",
-    "soap": "^0.38.0",
-    "socket.io": "^3.0.5",
-    "xml-js": "^1.6.11",
-    "xml2js": "^0.4.23",
-    "xss": "^1.0.8"
+    "sequelize": "^5.21.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.2",

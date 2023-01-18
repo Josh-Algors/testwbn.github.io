@@ -33,7 +33,8 @@ const db = {};
 db.User = require('../models/user')(sequelize, Sequelize);
 db.Oauth = require('../models/oauth')(sequelize, Sequelize);
 db.ActivationCode = require('../models/activation_code')(sequelize, Sequelize);
-db.PasswordReset = require('../models/password_reset')(sequelize, Sequelize);
+db.Product = require('../models/product')(sequelize, Sequelize);
+db.Cart = require('../models/cart')(sequelize, Sequelize);
 
 db.sequelize = sequelize;
  

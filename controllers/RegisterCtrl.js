@@ -2,10 +2,7 @@ const db = require('../database/db');
 const helpers = require('../config/helpers');
 const otpMail = require('../mailer/otpMail');
 const bcrypt = require('bcryptjs');
-var uuid = require('node-uuid');
 const Joi = require('joi');
-// const sms = require('../services/sendsms');
-// const bvnChecker = require('../services/bvn-validate');
 const moment = require('moment');
 
 module.exports = {
@@ -13,7 +10,84 @@ module.exports = {
   register: async (req, res, next) => {
 
     const tagSchema = Joi.object().keys({
-      account_type: Joi.string().required()
+      email: Joi.string().required(),
+      password: Joi.string().required(),
+      first_name: Joi.string().required(),
+      last_name: Joi.string().required()
+    }).unknown();
+
+    const validate = Joi.validate(req.body, tagSchema)
+
+    if (validate.error != null) 
+    {
+      const errorMessage = validate.error.details.map(i => i.message).join('.');
+      return res.status(400).json(
+        helpers.sendError(errorMessage)
+      );
+    }
+
+    var today = new Date();
+
+    var check = await db.User.findOne({
+      where: {
+        email: req.body.email
+      }
+    });
+
+    if(check)
+    {
+      return res.status(400).json(
+        helpers.sendError('Email has been used!!!')
+      );
+    }
+
+    const {email, password, first_name, last_name} = req.body;
+
+    var otp = await helpers.generateClientId(4);
+    // var uuid_v = uuid();
+
+    var user = await db.User.create({
+      email: email.toLowerCase(),
+      password: bcrypt.hashSync(password),
+      first_name: first_name,
+      last_name: last_name,
+      status: 0
+    });
+
+    await db.ActivationCode.create({
+      email: email,
+      otp: otp,
+      expiry_date: today.setMinutes(today.getMinutes() + 30),
+      status: 0
+    })
+
+    //Send email to individual here
+    const mail = {
+      email: user.email.toLowerCase(),
+      otp: otp,
+      name: first_name,
+    };
+
+    try {
+      //dispatch email
+      otpMail.send(mail);
+    }
+    catch (e) { }
+
+    return res.status(200).json({
+      success: {
+        status: 'SUCCESS',
+        message: 'Account created successfully. Please check your email ' + helpers.formatEmailAsterisk(email) + ' for activation code.',
+        email: email
+      }
+    });
+
+  },
+
+  resendOTP: async (req, res, next) => {
+
+    const tagSchema = Joi.object().keys({
+      email: Joi.string().required(),
     }).unknown();
 
     const validate = Joi.validate(req.body, tagSchema)
@@ -25,172 +99,54 @@ module.exports = {
       );
     }
 
-    var check = await db.User.findOne({
-      where: {
-        email: req.body.email
-      }
-    });
+    const {email} = req.body;
 
-    if (check) {
-      return res.status(400).json(
-        helpers.sendError('Email has been used!!!')
-      );
+    var today = new Date();
+    var updateOTP = await db.ActivationCode.findOne({ where: { email: email } });
+    var info = await db.User.findOne({ where: { email: email } });
+
+    if(updateOTP)
+    {
+      await updateOTP.destroy();
     }
 
-    else {
 
-      if (req.body.account_type == "Investor") {
-
-        const tagSchema = Joi.object().keys({
-          email: Joi.string().required(),
-          first_name: Joi.string().required(),
-          last_name: Joi.string().required(),
-          password: Joi.string().required()
-        }).unknown();
-    
-        const validate = Joi.validate(req.body, tagSchema)
-    
-        if (validate.error != null) {
-          const errorMessage = validate.error.details.map(i => i.message).join('.');
-          return res.status(400).json(
-            helpers.sendError(errorMessage)
-          );
-        }
-
-        var otp = await helpers.generateClientId(4);
-        // var uuid_v = uuid();
-
-        var user = await db.User.create({
-          user_id: uuid(),
-          password: bcrypt.hashSync(req.body.password),
-          first_name: req.body.first_name,
-          last_name: req.body.last_name,
-          email: req.body.email.toLowerCase(),
-          account_type: req.body.account_type,
-        });
-
-        await db.ActivationCode.create({
-          email: user.email,
-          otp: otp,
-          expiry_date: moment().add(30, 'minutes').format(),
-          status: 0,
-        });
-
-
-        //Send email to individual here
-        const mail = {
-          email: user.email.toLowerCase(),
-          otp: otp,
-          name: req.body.first_name,
-        };
-
-        try {
-          //dispatch email
-          otpMail.send(mail);
-        }
-        catch (e) { }
-
-        return res.status(200).json({
-          success: {
-            status: 'SUCCESS',
-            message: 'Account created successfully. Please check your email for activation code.',
-            email: helpers.formatEmailAsterisk(user.email)
-        }
-      });
-      }
-      else {
-
-        const tagSchema = Joi.object().keys({
-          email: Joi.string().required(),
-          company_name: Joi.string().required(),
-          password: Joi.string().required()
-        }).unknown();
-    
-        const validate = Joi.validate(req.body, tagSchema)
-    
-        if (validate.error != null) {
-          const errorMessage = validate.error.details.map(i => i.message).join('.');
-          return res.status(400).json(
-            helpers.sendError(errorMessage)
-          );
-        }
-        var otp = await helpers.generateClientId(4);
-        // var uuid_v = uuid();
-
-        var user = await db.User.create({
-          user_id: uuid(),
-          password: bcrypt.hashSync(req.body.password),
-          company_name: req.body.company_name,
-          email: req.body.email.toLowerCase(),
-          account_type: req.body.account_type,
-        });
-
-        await db.ActivationCode.create({
-          email: user.email,
-          otp: otp,
-          expiry_date: moment().add(30, 'minutes').format(),
-          status: 0,
-        });
-
-
-        //Send email to individual here
-        const mail = {
-          email: user.email.toLowerCase(),
-          otp: otp,
-          name: req.body.company_name,
-        };
-
-        try {
-          //dispatch email
-          otpMail.send(mail);
-        }
-        catch (e) { }
-
-        return res.status(200).json({
-          success: {
-            status: 'SUCCESS',
-            message: 'Account created successfully. Please check your email for activation code.',
-            email: helpers.formatEmailAsterisk(user.email)
-        }
-      });
-      }
-
-    }
-
-  },
-
-  resendOTP: async (req, res, next) => {
-
-    var updateOTP = await db.ActivationCode.findOne({ where: { email: req.body.email } });
-    var info = await db.User.findOne({ where: { email: req.body.email } });
-
-
-    if (!updateOTP && !info) {
+    if(!info)
+    {
       return res.status(400).json(
         helpers.sendError('Email not found / Account has been activated!')
       );
+    } 
+    else
+    {
+        var otp = await helpers.generateClientId(4);
+        
+        await db.ActivationCode.create({
+          email: email,
+          otp: otp,
+          expiry_date: today.setMinutes(today.getMinutes() + 30),
+          status: 0
+        });
 
+        //Send email to individual here
+        const mail = {
+          email: email.toLowerCase(),
+          otp: otp,
+          name: info.first_name
+        };
 
-    } else {
-      updateOTP.otp = await helpers.generateClientId(4);
-      await updateOTP.save();
+        try {
+          //dispatch email
+          otpMail.send(mail);
+        }
+        catch (e) { 
+          return res.status(500).json(helpers.sendError("error occured..."));
+        }
 
-      //Send email to individual here
-      const mail = {
-        email: req.body.email.toLowerCase(),
-        otp: updateOTP.otp,
-        name: info.first_name
-      };
-
-      try {
-        //dispatch email
-        otpMail.send(mail);
-      }
-      catch (e) { }
-
-      return res.status(200).json(
-        helpers.sendSuccess('A new OTP has been sent to your mail!')
-      );
+        return res.status(200).json(
+          helpers.sendSuccess('A new OTP has been sent to your mail!')
+        );
+      
     }
   },
 
@@ -210,15 +166,17 @@ module.exports = {
       );
     }
 
+    const {otp, email} = req.body;
+
     var activation = await db.ActivationCode.findOne({
       where: {
-        email: req.body.email,
-        otp: req.body.otp
+        email: email,
+        otp: otp
       }
     });
 
-    if (activation) {
-
+    if(activation)
+    {
       //check expiry minute
 
       var user = await db.User.findOne({
@@ -227,7 +185,7 @@ module.exports = {
         }
       });
 
-      user.activation = 1;
+      user.status = 1;
       await user.save();
 
       await activation.destroy();

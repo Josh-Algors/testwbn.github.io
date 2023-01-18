@@ -5,7 +5,6 @@ const helpers = require('../config/helpers');
 var uuid = require('node-uuid');
 var moment = require('moment');
 const otpMail = require('../mailer/otpMail');
-const resetPassword = require('../mailer/sendPasswordReset');
 
 module.exports = {
 
@@ -164,124 +163,6 @@ module.exports = {
       });
     }
 
-  },
-
-  forgotPassword: async (req, res, next) => {
-
-    const loginSchema = Joi.object().keys({
-      email: Joi.string().min(5).required()
-    })
-
-    const validate = Joi.validate(req.body, loginSchema)
-
-    if (validate.error != null) {
-      const errorMessage = validate.error.details.map(i => i.message).join('.');
-      return res.status(400).json(
-        helpers.sendError(errorMessage)
-      );
-    }
-
-    var checkUser = await db.User.findOne({where: {email: req.body.email}});
-
-    if(!checkUser){
-      return res.status(400).json(helpers.sendError("Account does not exist!"));
-    }
-
-    await db.PasswordReset.destroy({where: {user_id: checkUser.user_id}});
-
-    var otp = uuid();
-
-    await db.PasswordReset.create({
-      user_id: checkUser.user_id,
-      token: otp,
-      status: 0,
-  });
-
-    const mail = {
-      email: req.body.email.toLowerCase(),
-      name: checkUser.first_name,
-      link: process.env.SITE + "/reset-password/?token=" + otp
-    };
-
-    try {
-      //dispatch email
-      resetPassword.send(mail);
-    }
-    catch (e) { }
-
-    return res.status(200).json(helpers.sendSuccess("Password reset link has been sent to your email."));
-
-  },
-
-  validateToken: async (req, res, next) => {
-
-    const validateTokenschema = Joi.object().keys({
-        token: Joi.string().min(5).required()
-    }).unknown();
-
-    const validate = Joi.validate(req.body, validateTokenschema)
-
-    if (validate.error != null) {
-        const errorMessage = validate.error.details.map(i => i.message).join('.');
-        return res.status(400).json(
-            helpers.sendError(errorMessage)
-        );
-    }
-
-    var token = req.body.token;
-    var check = await db.PasswordReset.findOne({ where: { token: token } });
-
-    if (check) {
-        if (check.status == 1) {
-            return res.status(400).json(
-                helpers.sendError("Password Token has been used")
-            );
-        }
-
-        return res.status(200).json(
-            helpers.sendSuccess("Valid Token")
-        );
-    }
-
-    return res.status(400).json(
-        helpers.sendError("Password Token has expired")
-    );
-
-  },
-
-  updatePassword: async (req, res, next) => {
-
-    const updatePasswordSchema = Joi.object().keys({
-        password: Joi.string().min(5).required(),
-        token: Joi.string().min(3).required()
-    }).unknown();
-
-    const validate = Joi.validate(req.body, updatePasswordSchema)
-
-    if (validate.error != null) {
-        const errorMessage = validate.error.details.map(i => i.message).join('.');
-        return res.status(400).json(
-            helpers.sendError(errorMessage)
-        );
-    }
-
-    var getUser = await db.PasswordReset.findOne({ where: { token: req.body.token } });
-
-    if (getUser) {
-        var user = await db.User.findOne({ where: { user_id: getUser.user_id } });
-        user.password = bcrypt.hashSync(req.body.password);
-        await user.save();
-
-        await getUser.destroy();
-
-        return res.status(200).json(
-            helpers.sendSuccess("Password updated successfully!")
-        );
-    }
-
-    return res.status(400).json(
-        helpers.sendError("Password Token has expired")
-    );
-  },
+  }
 
 };

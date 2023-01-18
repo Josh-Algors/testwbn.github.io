@@ -46,7 +46,6 @@ const send = async options => {
     };
   
     const info = await transporter.sendMail(message);
-    console.log(info.messageId);
     return info;
    
 }

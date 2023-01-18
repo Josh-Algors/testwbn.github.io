@@ -13,7 +13,7 @@ module.exports.redisCache = (req,res,next) => {
     client.get(type, (err, result) => {
 
         if (err) {
-            // console.error(err);
+            
             next();
 
         } else {
